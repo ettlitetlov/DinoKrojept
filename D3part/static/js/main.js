@@ -1,5 +1,5 @@
 
-var map, pc, bc;
+var flowmap, pc, bc;
 function draw(activeData, dFri, dSat, dSun){
   
   //map = new Map(data2014, data2010, data2006, data2002, pcYear, sweden_map_json);
@@ -19,5 +19,5 @@ d3.queue()
 
 
 function update(){
-  map.updateData();
+  flowmap.updateData();
 }
