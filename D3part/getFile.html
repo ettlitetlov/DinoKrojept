@@ -10,17 +10,21 @@
                 #lineChartHolder {
                     margin: 20px;
                 }
+                #userControls {
+                    display: inline-block;
+                    width: 200px;
+                }
+                #actualLineChart {
+                    display: inline-block;
+                }
             </style>
-            
-            <!--<script src="https://d3js.org/d3-geo-projection.v1.min.js"></script>-->
             <script src="http://d3js.org/d3.v4.min.js"></script>
-            <!--<script src="https://d3js.org/d3-path.v1.min.js"></script>-->
     </head>
     <body>
         
             
             <div id="lineChartHolder">
-                <svg width="960" height="500"></svg>
+                <svg id="actualLineChart" width="960" height="500"></svg>
                 <div id="userControls">
                         <p>Please refrain from trying to display any data until you've seen the first graph! :) </p>
                     <form action="">
@@ -28,6 +32,30 @@
                         <input type="radio" id="dayOfData" name="day" value="saturday"> Saturday<br>
                         <input type="radio" id="dayOfData" name="day" value="sunday"> Sunday<br>
                         "all" or ID of interesting person: <input type="text" name="idOfPerson" id="idOfPerson" value="all"><br>
+                        <fieldset>
+                                Areas<br>
+                                <div>
+                                  <input type="checkbox" id="kiddie" name="areas" value="0" checked>
+                                  <label for="kiddie">Kiddie Land</label>
+                                </div>
+                                <div>
+                                  <input type="checkbox" id="tundra" name="areas" value="1" checked>
+                                  <label for="tundra">Tundra Land</label>
+                                </div>
+                                <div>
+                                        <input type="checkbox" id="entry" name="areas" value="2" checked>
+                                        <label for="entry">Entry Corridor</label>
+                                    </div>
+                                <div>
+                                    <input type="checkbox" id="wet" name="areas" value="3" checked>
+                                    <label for="wet">Wet Land</label>
+                                </div>
+                                <div>
+                                        <input type="checkbox" id="coaster" name="areas" value="4" checked>
+                                        <label for="coaster">Coaster Alley</label>
+                                    </div>
+                              </fieldset>
+
                         <input type="button" value="Show me the data" onclick="draw()">
                     </form>
                 </div>
@@ -47,6 +75,17 @@
             var linechart, filteredData;
             var dataFri, dataSat, dataSun;
 
+            function getUncheckedBoxes(chkboxName) {
+                var checkboxes = document.getElementsByName(chkboxName);
+                var checkboxesUnchecked = [];
+                for (var i=0; i<checkboxes.length; i++) {
+                    if (!checkboxes[i].checked) {
+                        checkboxesUnchecked.push(i);
+                    }
+                }
+                return checkboxesUnchecked;
+            }
+
             function assignVariables(error, dFri, dSat, dSun) {
                 if (error) throw error;
                 dataFri = dFri;
@@ -59,11 +98,12 @@
                 d3.selectAll("svg > *").remove();
                 var whichDay = document.querySelector('input[name="day"]:checked').value;
                 var whichID = document.getElementById('idOfPerson').value;
-                console.log("got day " + whichDay + " and id "+ whichID);
+                var whichAreas = getUncheckedBoxes("areas");
+                console.log(whichAreas);
 
-                if (whichDay === "friday") linechart = createLinechart(dataFri, whichID);
-                else if (whichDay === "saturday") linechart = createLinechart(dataSat, whichID);
-                else linechart = createLinechart(dataSun, whichID);
+                if (whichDay === "friday") linechart = createLinechart(dataFri, whichID, whichAreas);
+                else if (whichDay === "saturday") linechart = createLinechart(dataSat, whichID, whichAreas);
+                else linechart = createLinechart(dataSun, whichID, whichAreas);
             }
         </script>
     </body>    
