@@ -17,16 +17,24 @@
 }
 
 #slider {
-  width: 960;
+  width: 960px;
+}
+#output {
+  font: 16px sans-serif;
+}
+div {
+  font: 16px sans-serif;
 }
 
 
 </style>
 <svg width="960" height="600"></svg>
 <div>
-  <input type="range" min="1" max="200" value="1" id="slider" onmouseup="newForceGraph()">
+  <input type="range" min="0" max="200" value="1" id="slider" onmouseup="newForceGraph()">
   <output id="output"></output>
+  
 </div>
+<div id="dataRange"></div>
 <script src="https://d3js.org/d3.v4.min.js"></script>
 <script src="forceGraph.js"></script>
 <script>
@@ -38,18 +46,13 @@ function draw(data){
 }
 
 d3.queue()
-   .defer(d3.csv, 'comm-data-Fri.csv')
+   .defer(d3.csv, 'comm-data-Sun.csv')
    .await(function(error, data) {
       if(error) throw error;  
       draw(data);
+
 });
 
-document.getElementById("output").value = document.getElementById("slider").value;
-
-var svg = d3.select("svg"),
-    margin = {right: 50, left: 50}, 
-    width = +svg.attr("width"),
-    height = +svg.attr("height");
 
 
 // The colors for each park region
@@ -62,17 +65,7 @@ let uniqObj = {};
 var simulation = d3.forceSimulation()
     .force("link", d3.forceLink().id(function(d) { return d.id; }))
     .force("charge", d3.forceManyBody())
-    .force("center", d3.forceCenter(width / 2, height / 2));
-
-
-svg = d3.select("svg")
- .append("svg")
- .attr("width", "100%")
- .attr("height", "100%")
- .call(d3.zoom().on("zoom", function () {
-    svg.attr("transform", d3.event.transform)
- }))
- .append("g")
+    .force("center", d3.forceCenter(960 / 2, 600 / 2));
 
 
 function dragstarted(d) {
