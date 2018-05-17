@@ -2,17 +2,38 @@ function forceGraph(data) {
 
     this.data = data;
 
+    var svg = d3.select("svg"),
+    margin = {right: 50, left: 50}, 
+    width = +svg.attr("width"),
+    height = +svg.attr("height");
+
+    svg = d3.select("svg")
+        .append("svg")
+        .attr("width", "100%")
+        .attr("height", "100%")
+        .call(d3.zoom().on("zoom", function () {
+            svg.attr("transform", d3.event.transform)
+        }))
+        .append("g")
+
+    update(0);
+
     function update(startVal)
     {
+        const minVal = Math.min(data.length-1,startVal+Math.floor((data.length / 200))); 
+        document.getElementById("output").value = data[Math.max(Math.floor(((data.length / 200) * (document.getElementById("slider").value))) -1,0)].Timestamp + " -> " + data[minVal].Timestamp;
+        svg.selectAll("*").remove();
+
+
         let allComms = [];
         let allToComms = [];
         let links = {};
         let unique = [];
         let listOfLinks = [];
         let locations = [];
-        let start = startVal;
+        let start = Math.floor(startVal);
     
-        let num = 2000;
+        let num = data.length/200;
     
         // Fetching necessary data and storing it in local variables
         data.forEach(function(d) {
@@ -21,36 +42,35 @@ function forceGraph(data) {
         locations.push(d.location)
         })
     
-        document.getElementById("slider").min = data[0].Timestamp;
     
         // Just taking a limited number of the dataset, to improve perfomance and interactability
-        for(var i = start; i < num; i++){
-        if(unique.indexOf(allComms[i]) === -1){
-            unique.push(allComms[i]);
-        }
-        if(unique.indexOf(allToComms[i]) === -1) {
+        for(var i = start; i < Math.min(data.length,(start +num)); i++){
+            if(unique.indexOf(allComms[i]) === -1){
+                unique.push(allComms[i]);
+            }
+            if(unique.indexOf(allToComms[i]) === -1) {
             unique.push(allToComms[i]);
-        }
+            }
         }
     
         // Initializing a JSON-formatted object with an array of all communcation sources to target.
-        for(var k = 0; k < num; k++){
-        let tinyObj2 = {};
-        tinyObj2.source = allComms[k];
-        tinyObj2.target = allToComms[k];
-        tinyObj2.value = 1;
-        tinyObj2.location = locations[k];
-        listOfLinks.push(tinyObj2);
+        for(var k = start; k < Math.min(data.length,(start +num)); k++){
+            let tinyObj2 = {};
+            tinyObj2.source = allComms[k];
+            tinyObj2.target = allToComms[k];
+            tinyObj2.value = 1;
+            tinyObj2.location = locations[k];
+            listOfLinks.push(tinyObj2);
         }
         
         let listOfGroups = [];
         let j = 0;
         unique.forEach( function(element) {
-        let tinyObj = {};
-        tinyObj.id = element;
-        tinyObj.group = j;
-        j++;
-        listOfGroups.push(tinyObj);
+            let tinyObj = {};
+            tinyObj.id = element;
+            tinyObj.group = j;
+            j++;
+            listOfGroups.push(tinyObj);
         })
         listOfGroups.push({"id": "0", "group": 2950});
         uniqObj = listOfGroups;
@@ -62,7 +82,7 @@ function forceGraph(data) {
         .enter().append("line")
             .attr("stroke-width", function(d) { return d.value;});
     
-        console.log("Done with the links!");
+
         var node = svg.append("g")
         .attr("class", "nodes")
         .selectAll("circle")
@@ -75,9 +95,9 @@ function forceGraph(data) {
             .call(d3.drag()
                 .on("start", dragstarted)
                 .on("drag", dragged)
-                .on("end", dragended)); 
+                .on("end", dragended))
+
     
-        console.log("Done with the nodes!");
         node.append("title")
             .text(function(d) { return d.id; });
     
@@ -99,14 +119,12 @@ function forceGraph(data) {
             .attr("cx", function(d) { return d.x; })
             .attr("cy", function(d) { return d.y; });
         }
+
     }
     
-
     this.updateForceGraph = function() {
-        var someVal = Math.floor(((data.length / document.getElementById("slider").value) - 1000) );
-        console.log("Updating data with start value of: " + someVal);
+        var someVal = Math.floor(((data.length / 200) * document.getElementById("slider").value));
         update(someVal);
     }
 
-    update(0);
 }
