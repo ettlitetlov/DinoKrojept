@@ -1,6 +1,7 @@
 function forceGraph(data) {
 
     this.data = data;
+    var listToSend = [];
 
     var svg = d3.select("svg"),
     margin = {right: 50, left: 50}, 
@@ -93,11 +94,12 @@ function forceGraph(data) {
             .style("stroke-width", "0.5px")
             .attr("fill", function(d) { return colors[getColorIndex(d.id, listOfLinks)];})
             .call(d3.drag()
-                .on("start", dragstarted)
-                .on("drag", dragged)
-                .on("end", dragended))
+            .on("start", dragstarted)
+            .on("drag", dragged)
+            .on("end", dragended))
+            .on("click", arrayBuilder)
 
-    
+        
         node.append("title")
             .text(function(d) { return d.id; });
     
@@ -120,11 +122,27 @@ function forceGraph(data) {
             .attr("cy", function(d) { return d.y; });
         }
 
+        function arrayBuilder(id){
+
+
+            if(listToSend.indexOf(id.id.toString()) == -1){
+                listToSend.push(id.id.toString());
+                d3.select(this).style("fill", "blue");
+            }
+            else{
+                listToSend.splice(listToSend.indexOf(id.id.toString()),1);
+                d3.select(this).style("fill", function(d) {return colors[getColorIndex(id, listOfLinks)]});
+            }
+            console.log(listToSend);
+        }
+
     }
     
     this.updateForceGraph = function() {
         var someVal = Math.floor(((data.length / 200) * document.getElementById("slider").value));
         update(someVal);
     }
+
+
 
 }
