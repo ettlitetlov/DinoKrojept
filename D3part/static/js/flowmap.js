@@ -1,32 +1,110 @@
-function flowmap(data, width, height){
+function flowmap(inData, width, height){
     //Inspiration: https://gist.github.com/Andrew-Reid/8de4b9d0d0a87a478770e0cc86e2f5e4
-    var locations = assignCoordinatesToLocations();
+    console.log("entered flowmap function");
+    console.log("Communications length = " + inData.length);
+    var locations = assignCoordinatesToArray();
+    var locationsDict = assignCoordinatesToLocations();
+    var communications = inData;
+   //var communications = loadCommunicationdataFromFile();
+    /*d3.csv("../data/comm-data-Fri.csv", function (d) {
+        return {
+            Timestamp: d.Timestamp,
+            from: +d.from,
+            to: +d.to,
+            location: d.location
 
-    var linePathGenerator = d3.svg.line()
-    .x(function(d) { return d.coords[0]; })
-    .y(function(d) { return d.coords[1]; });
-    linePathGenerator(locations);
+        };
+    });*/
+/*
+    var linePathGenerator = d3.line()
+        .x(function(d, i) { return d.coords[0] * width / 100;})
+        .y(function(d, i) { return d.coords[1] * height / 100;});
 
+    var linePathGeneratorFromCommunicationData = d3.line()
+        .x(function(d) {return locationsDict[d.from].coords[0] * width / 100;})
+        .y(function(d) {return locationsDict[d.from].coords[1] * height / 100;});
+    //var generatedLinePath = linePathGenerator(locations);
+    var generatedLinePath = linePathGeneratorFromCommunicationData(communications);
+*/
     var svgContainer = d3.select("body")
-    .append("svg")
-    .attr("width", "400")
-    .attr("height", "400");
+        .append("svg")
+        .attr("width", "400")
+        .attr("height", "400");
 
-    var svgPath = svgContainer
-    .append("path")
+    /*var svgPath = svgContainer
+    .append("line")
     .attr("stroke", "blue")
     .attr("stroke-width", "4px")
-    .attr("fill", "none");
+    .attr("fill", "none");*/
+/*
+     var lineGenerator = svgContainer.append("line")
+        .attr("x1", function(d) {return locationsDict[d.from].coords[0] * width / 100;})
+        .attr("y1", function(d) {return locationsDict[d.from].coords[1] * height / 100;})
+        .attr("x2", function(d) {return locationsDict[d.to].coords[0] * width / 100;})
+        .attr("y2", function(d) {return locationsDict[d.to].coords[1] * height / 100;});*/
 
-    svgPath
-    .attr("d", linePathGenerator(locations));
+    //svgPath.attr("d", generatedLinePath);
+
+    for (var i = 0; i < communications.length; i++) {
+        var d = communications[i];
+        svgContainer.append("line")
+            .attr("x1",locationsDict[d.from].coords[0] * width / 100)
+            .attr("y1",  locationsDict[d.from].coords[1] * height / 100)
+            .attr("x2",  locationsDict[d.to].coords[0] * width / 100)
+            .attr("y2", locationsDict[d.to].coords[1] * height / 100)
+            .attr("stroke", "blue")
+            .attr("stroke-width", "2px")
+            .attr("fill", "none");
+    }
 
     //d3.geoPath().MultiPoint(locations);
+}
+/*
+function assignCoordinatesToArray() {
+    var locations = [
+    {id: 1, coords: [46.1, 89.2]},
+        ,{id: 2, coords: [27.3, 86]},
+        ,{id: 3, coords: [38.9, 12.1]},
+       ,{id: 4, coords: [78.4, 48.7]}
+    ]
+    return locations;
+}
+*/
+function assignCoordinatesToArray() {
+    var locations = [
+        {id: 1, coords: [46.1, 89.2]},
+        {id: 2, coords: [27.3, 86]},
+        {id: 3, coords: [38.9, 12.1]},
+        {id: 4, coords: [78.4, 48.7]}
+    ]
+    return locations;
+}
+
+function createTestCommunicationInfo() {
+    var communications = [
+        {from:  "Wrightiraptor Mountain", to: "Galactosaurus Rage"},
+        {from: "TerrorSaur", to: "Wrightiraptor Mountain"}
+    ]
+    return communications;
+}
+
+function loadCommunicationdataFromFile() {
+    var data = d3.csv("../data/comm-data-Fri.csv", function (d) {
+        return {
+            Timestamp: d.Timestamp,
+            from: +d.from,
+            to: +d.to,
+            location: d.location
+
+        };
+    });
+    return data;
 }
 
 function assignCoordinatesToLocations() {
     //Coords in percent of image width/height
     var locations = {
+        null: {id: 0, coords: [0,0]},
         "Wrightiraptor Mountain": {id: 1, coords: [46.1, 89.2]},
         "Galactosaurus Rage": {id: 2, coords: [27.3, 86]},
         "Auvilotops Express": {id: 3, coords: [38.9, 12.1]},
@@ -94,7 +172,13 @@ function assignCoordinatesToLocations() {
         "SabreTooth Theatre": {id: 64, coords: [84, 38]},
         "Primal Carnage Arcade": {id: 61, coords: [70.9, 32.4]},
         "Daily Slab Maps and Info": {id: 60, coords: [68.7, 7.8]},
-        "Liggement Fix-Me-Up": {id: 62, coords: [51.9, 42.2]}
+        "Liggement Fix-Me-Up": {id: 62, coords: [51.9, 42.2]},
+        "Kiddie Land": {id: 100, coords: [85.6, 19.1]},
+        "Tundra Land": {id: 101, coords: [27.2, 19.7]},
+        "Entry Corridor": {id: 102, coords: [63.5, 1.2]},
+        "Wet Land": {id: 103, coords: [41.1, 54.4]},
+        "Coaster Alley": {id: 104, coords: [58, 84]}
+
     }
     return locations;
 }
