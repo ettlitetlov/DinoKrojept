@@ -1,6 +1,17 @@
-function createLinechart(inputData, whichID) {
+Array.prototype.multisplice = function(args){
+    /*var args = Array.apply(null, arguments);
+    args.sort(function(a, b){
+        return a - b;
+    });*/
+    for(var i = 0; i < args.length; i++){
+        var index = args[i] - i;
+        this.splice(index, 1);
+    }        
+}
+
+function createLinechart(inputData, whichID, whichAreas) {
     var data;
-    if (whichID === "all") {
+    if (whichID === "all" || whichID === "") {
         data = transformDataForStackedAreaChart(inputData);
     }
     else {
@@ -36,9 +47,8 @@ function createLinechart(inputData, whichID) {
     });
 
     areas.splice(0, 1);
+    areas.multisplice(whichAreas);
 
-    console.log(data[0].time);
-    //x.domain(d3.extent(data, function(d) { return d.forEach(function(p) { return p.time; }); }));
     x.domain(d3.extent(data, function(d) { return parseTime(d.time); }));
 
     y.domain([
@@ -76,20 +86,23 @@ function createLinechart(inputData, whichID) {
         .style("stroke", function(d) { return z(d.id); })
         .style("fill", "none");
 
-        var legend_keys =  d3.keys(data[0]);
-        legend_keys.splice(0,1);
+    //Add beautiful legend
+    var legend_keys =  d3.keys(data[0]);
+    legend_keys.splice(0,1);
+    legend_keys.multisplice(whichAreas);
 
-        var lineLegend = svg.selectAll(".lineLegend").data(legend_keys)
-            .enter().append("g")
-            .attr("class","lineLegend")
-            .attr("transform", function (d,i) {
-                    return "translate(" + width + "," + (i*20)+")";
-                });
-        
-        lineLegend.append("text").text(function (d) {return d;})
-            .attr("transform", "translate(15,9)"); //align texts with boxes
-        
-        lineLegend.append("rect")
-            .attr("fill", function (d, i) {return z(d); })
-            .attr("width", 10).attr("height", 10);
-}
+    var lineLegend = svg.selectAll(".lineLegend").data(legend_keys)
+        .enter().append("g")
+        .attr("class","lineLegend")
+        .attr("transform", function (d,i) {
+                return "translate(" + width + "," + (i*20)+")";
+            });
+    
+    lineLegend.append("text").text(function (d) {return d;})
+        .attr("transform", "translate(15,9)"); //align texts with boxes
+    
+    lineLegend.append("rect")
+        .attr("fill", function (d, i) {return z(d); })
+        .attr("width", 10).attr("height", 10);
+
+  }
