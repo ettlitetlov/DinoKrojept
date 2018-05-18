@@ -1,25 +1,23 @@
 Array.prototype.multisplice = function(args){
-    /*var args = Array.apply(null, arguments);
-    args.sort(function(a, b){
-        return a - b;
-    });*/
+    //requires incoming args to be in order
     for(var i = 0; i < args.length; i++){
         var index = args[i] - i;
         this.splice(index, 1);
     }        
 }
 
-function createLinechart(inputData, whichID, whichAreas) {
+function createLinechart(inputData, whichID, whichAreas, whichSvg) {
     var data;
     if (whichID === "all" || whichID === "") {
         data = transformDataForStackedAreaChart(inputData);
     }
     else {
+        if (typeof whichID === 'string' || whichID instanceof String) whichID = [whichID];
         data = extractDataForID(inputData, whichID);
     }
 
     //https://bl.ocks.org/mbostock/3884955
-    var svg = d3.select("svg"),
+    var svg = d3.select("#"+whichSvg),
     margin = {top: 20, right: 80, bottom: 30, left: 50},
     width = svg.attr("width") - margin.left - margin.right,
     height = svg.attr("height") - margin.top - margin.bottom,
@@ -86,23 +84,25 @@ function createLinechart(inputData, whichID, whichAreas) {
         .style("stroke", function(d) { return z(d.id); })
         .style("fill", "none");
 
-    //Add beautiful legend
-    var legend_keys =  d3.keys(data[0]);
-    legend_keys.splice(0,1);
-    legend_keys.multisplice(whichAreas);
+    if (whichSvg === "mainLineChart") {
+        //Add beautiful legend
+        var legend_keys =  d3.keys(data[0]);
+        legend_keys.splice(0,1);
+        legend_keys.multisplice(whichAreas);
 
-    var lineLegend = svg.selectAll(".lineLegend").data(legend_keys)
-        .enter().append("g")
-        .attr("class","lineLegend")
-        .attr("transform", function (d,i) {
-                return "translate(" + width + "," + (i*20)+")";
-            });
-    
-    lineLegend.append("text").text(function (d) {return d;})
-        .attr("transform", "translate(15,9)"); //align texts with boxes
-    
-    lineLegend.append("rect")
-        .attr("fill", function (d, i) {return z(d); })
-        .attr("width", 10).attr("height", 10);
+        var lineLegend = svg.selectAll(".lineLegend").data(legend_keys)
+            .enter().append("g")
+            .attr("class","lineLegend")
+            .attr("transform", function (d,i) {
+                    return "translate(" + width + "," + (i*20)+")";
+                });
+        
+        lineLegend.append("text").text(function (d) {return d;})
+            .attr("transform", "translate(15,9)"); //align texts with boxes
+        
+        lineLegend.append("rect")
+            .attr("fill", function (d, i) {return z(d); })
+            .attr("width", 10).attr("height", 10);
+    }
 
   }

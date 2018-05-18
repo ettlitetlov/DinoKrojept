@@ -14,7 +14,7 @@
                     display: inline-block;
                     width: 20%;
                 }
-                #actualLineChart {
+                #mainLineChart {
                     display: inline-block;
                 }
             </style>
@@ -24,7 +24,7 @@
         
             
             <div id="lineChartHolder">
-                <svg id="actualLineChart" width="960" height="500"></svg>
+                <svg id="mainLineChart" width="960" height="400"></svg>
                 <div id="userControls">
                         <p>Please refrain from trying to display any data until you've seen the first graph! :) </p>
                     <form action="">
@@ -32,6 +32,7 @@
                         <input type="radio" id="dayOfData" name="day" value="saturday"> Saturday<br>
                         <input type="radio" id="dayOfData" name="day" value="sunday"> Sunday<br>
                         "all" or ID of interesting person: <input type="text" name="idOfPerson" id="idOfPerson" value="all"><br>
+                        "all" or interesting cluster: <input type="text" name="numCluster" id="numCluster" value="all"><br>
                         <fieldset>
                                 Areas<br>
                                 <div>
@@ -60,6 +61,8 @@
                     </form>
                     <p>Interesting ID:s might include: 839736, 1278894</p>
                 </div>
+                <svg id="secondaryLineChart" width="500" height="300"></svg>
+                <svg id="thirdLineChart" width="500" height="300"></svg>
             </div>
 
         <script src='./static/js/filterdata.js' type='text/javascript'></script>
@@ -70,11 +73,12 @@
                 .defer(d3.csv, '/Users/isabelle/Documents/AvanceradVisuell/DinoKrojept/D3part/static/data/comm-data-Fri.csv')
                 .defer(d3.csv, '/Users/isabelle/Documents/AvanceradVisuell/DinoKrojept/D3part/static/data/comm-data-Sat.csv')
                 .defer(d3.csv, '/Users/isabelle/Documents/AvanceradVisuell/DinoKrojept/D3part/static/data/comm-data-Sun.csv')
+                .defer(d3.csv, '/Users/isabelle/Documents/AvanceradVisuell/DinoKrojept/D3part/static/data/clusterAssignmentsFri10.csv')
                 .await(assignVariables);
 
 
-            var linechart, filteredData;
-            var dataFri, dataSat, dataSun;
+            var linechart, secondLinechart, thirdChart, filteredData;
+            var dataFri, dataSat, dataSun, clustersFri, clustersSat, clustersSun;
 
             function getUncheckedBoxes(chkboxName) {
                 var checkboxes = document.getElementsByName(chkboxName);
@@ -87,11 +91,19 @@
                 return checkboxesUnchecked;
             }
 
-            function assignVariables(error, dFri, dSat, dSun) {
+            function assignVariables(error, dFri, dSat, dSun, cFri) {
+                //Loading original data
                 if (error) throw error;
                 dataFri = dFri;
                 dataSat = dSat;
                 dataSun = dSun;
+                clustersFri = cFri;
+                //clustersSat = cSat;
+                //clustersSun = cSun;
+                console.log("Finished loading data");
+                //console.log("Starting transformation for clustering");
+                //var clusterBase = clusterDataOfDay(dataSun);
+                //console.log(clusterBase);
                 draw("friday", "all");
             }
 
@@ -100,11 +112,33 @@
                 var whichDay = document.querySelector('input[name="day"]:checked').value;
                 var whichID = document.getElementById('idOfPerson').value;
                 var whichAreas = getUncheckedBoxes("areas");
-                console.log(whichAreas);
+                var whichCluster = document.getElementById('numCluster').value;
+                console.log("Showing info for cluster " + whichCluster);
+                if (whichCluster !== "all") {
+                    whichID = [];
+                    for (var i = 0; i < clustersFri.length; i++) {
+                        if (clustersFri[i].cluster === whichCluster) whichID.push(clustersFri[i].id);
+                    }
+                }
+                console.log("Showing graph for ID:s");
+                console.log(whichID);
+                //filterdata(dataSun);
 
-                if (whichDay === "friday") linechart = createLinechart(dataFri, whichID, whichAreas);
-                else if (whichDay === "saturday") linechart = createLinechart(dataSat, whichID, whichAreas);
-                else linechart = createLinechart(dataSun, whichID, whichAreas);
+                if (whichDay === "friday") {
+                    linechart = createLinechart(dataFri, whichID, whichAreas, "mainLineChart");
+                    secondLinechart = createLinechart(dataSat, whichID, whichAreas, "secondaryLineChart");
+                    thirdChart = createLinechart(dataSun, whichID, whichAreas, "thirdLineChart");
+                }
+                else if (whichDay === "saturday") {
+                    linechart = createLinechart(dataSat, whichID, whichAreas, "mainLineChart");
+                    secondLinechart = createLinechart(dataFri, whichID, whichAreas, "secondaryLineChart");
+                    thirdChart = createLinechart(dataSun, whichID, whichAreas, "thirdLineChart");
+                }
+                else {
+                    linechart = createLinechart(dataSun, whichID, whichAreas, "mainLineChart");
+                    secondLinechart = createLinechart(dataFri, whichID, whichAreas, "secondaryLineChart");
+                    thirdChart = createLinechart(dataSat, whichID, whichAreas, "thirdLineChart");
+                }
             }
         </script>
     </body>    
