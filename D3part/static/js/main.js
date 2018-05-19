@@ -119,12 +119,17 @@ function assignClusters() {
   var transformedData;
   if (whichDay === "friday") { 
       assignedClustersFri = clusterDataOfDay(clustersBaseFri, k);
+      document.getElementById("numClustersFri").innerHTML = k;
   }
   else if (whichDay === "saturday") {
       assignedClustersSat = clusterDataOfDay(clustersBaseSat, k);
+      document.getElementById("numClustersSat").innerHTML = k;
+
   }
   else {
       assignedClustersSun = clusterDataOfDay(clustersBaseSun, k);
+      document.getElementById("numClustersSun").innerHTML = k;
+
   }
 }
 
