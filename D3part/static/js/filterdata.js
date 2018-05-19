@@ -156,7 +156,8 @@ function exportStackedAreaData(data) {
 function extractDataForID(data, ID) {
     var transformedData = generateTransformedDataBase();
     for (var i = 0; i < data.length; i++) {
-        if (ID.includes(data[i].from)) {
+        //if (ID.includes(data[i].from)) {
+        if (checkIfInSortedList(ID, data[i].from)) {
         //if (data[i].from === ID) {
             var placeInList = calculatePlaceInListByStamp(data[i].Timestamp);
             transformedData[placeInList][data[i].location] += 1;
@@ -317,4 +318,27 @@ function checkIfInIntervalAndLocationOfEvent(hour, minute, location) {
         }
     }
     return false;
+}
+
+function checkIfInSortedList(array, value) {
+    return binarySearch(array, value) != -1;
+}
+
+var binarySearch = function(array, value) {
+    //Source: https://gist.github.com/cbdavide/97100ac68e1f3699274b38a3d6bde7ba
+    var guess,
+        min = 0,
+        max = array.length - 1;	
+
+    while(min <= max){
+        guess = Math.floor((min + max) /2);
+	if(array[guess] === value)
+	    return guess;
+	else if(array[guess] < value)
+	    min = guess + 1;
+	else
+	    max = guess - 1;	
+     }
+	
+     return -1;
 }

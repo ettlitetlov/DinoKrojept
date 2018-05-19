@@ -14,6 +14,10 @@
                     display: inline-block;
                     width: 20%;
                 }
+                #clusterControls {
+                    display: inline-block;
+                    width: 5%;
+                }
                 #mainLineChart {
                     display: inline-block;
                 }
@@ -32,7 +36,12 @@
                         <input type="radio" id="dayOfData" name="day" value="saturday"> Saturday<br>
                         <input type="radio" id="dayOfData" name="day" value="sunday"> Sunday<br>
                         "all" or ID of interesting person: <input type="text" name="idOfPerson" id="idOfPerson" value="all"><br>
+                        <p>(Interesting ID:s might include: 839736, 1278894)</p>
                         "all" or interesting cluster: <input type="text" name="numCluster" id="numCluster" value="all"><br>
+                        <b>Cluster from day:</b><br>
+                        <input type="radio" id="clusterFromDay" name="clusterFromDay" value="friday" checked="checked"> Friday<br>
+                        <input type="radio" id="clusterFromDay" name="clusterFromDay" value="saturday"> Saturday<br>
+                        <input type="radio" id="clusterFromDay" name="clusterFromDay" value="sunday"> Sunday<br>
                         <fieldset>
                                 Areas<br>
                                 <div>
@@ -59,26 +68,40 @@
 
                         <input type="button" value="Show me the data" onclick="draw()">
                     </form>
-                    <p>Interesting ID:s might include: 839736, 1278894</p>
+
+                </div>
+                <div id="clusterControls">
+                    <form>
+                        Number of clusters: <input type="text" name="numClusters" id="numClusters" value="5"><br>
+                        <b>Day for clustering:</b><br>
+                        <input type="radio" id="dayOfCluster" name="clusterDay" value="friday" checked="checked"> Friday<br>
+                        <input type="radio" id="dayOfCluster" name="clusterDay" value="saturday"> Saturday<br>
+                        <input type="radio" id="dayOfCluster" name="clusterDay" value="sunday"> Sunday<br>
+                        <input type="button" value="Cluster the data" onclick="assignClusters()">
+
+                    </form>
                 </div>
                 <svg id="secondaryLineChart" width="500" height="300"></svg>
                 <svg id="thirdLineChart" width="500" height="300"></svg>
             </div>
-
+        <script src='./static/js/k-means.js' type='text/javascript'></script>
         <script src='./static/js/filterdata.js' type='text/javascript'></script>
         <script src='./static/js/createLinechart.js' type='text/javascript'></script>
         
         <script>
                 d3.queue()
-                .defer(d3.csv, '/Users/isabelle/Documents/AvanceradVisuell/DinoKrojept/D3part/static/data/comm-data-Fri.csv')
-                .defer(d3.csv, '/Users/isabelle/Documents/AvanceradVisuell/DinoKrojept/D3part/static/data/comm-data-Sat.csv')
-                .defer(d3.csv, '/Users/isabelle/Documents/AvanceradVisuell/DinoKrojept/D3part/static/data/comm-data-Sun.csv')
-                .defer(d3.csv, '/Users/isabelle/Documents/AvanceradVisuell/DinoKrojept/D3part/static/data/clusterAssignmentsFri10.csv')
+                .defer(d3.csv, './static/data/comm-data-Fri.csv')
+                .defer(d3.csv, './static/data/comm-data-Sat.csv')
+                .defer(d3.csv, './static/data/comm-data-Sun.csv')
+                .defer(d3.csv, './static/data/idBehaviorDataFri.csv')
+                .defer(d3.csv, './static/data/idBehaviorDataSat.csv')
+                .defer(d3.csv, './static/data/idBehaviorDataSun.csv')
                 .await(assignVariables);
 
 
             var linechart, secondLinechart, thirdChart, filteredData;
-            var dataFri, dataSat, dataSun, clustersFri, clustersSat, clustersSun;
+            var dataFri, dataSat, dataSun, clustersBaseFri, clustersBaseSat, clustersBaseSun,
+                assignedClustersFri, assignedClustersSat, assignedClustersSun;
 
             function getUncheckedBoxes(chkboxName) {
                 var checkboxes = document.getElementsByName(chkboxName);
@@ -91,33 +114,48 @@
                 return checkboxesUnchecked;
             }
 
-            function assignVariables(error, dFri, dSat, dSun, cFri) {
+            function assignVariables(error, dFri, dSat, dSun, cFri, cSat, cSun) {
                 //Loading original data
                 if (error) throw error;
                 dataFri = dFri;
                 dataSat = dSat;
                 dataSun = dSun;
-                clustersFri = cFri;
-                //clustersSat = cSat;
-                //clustersSun = cSun;
+                clustersBaseFri = parseBehaviorDataIntoInt(cFri);
+                clustersBaseSat = parseBehaviorDataIntoInt(cSat);
+                clustersBaseSun = parseBehaviorDataIntoInt(cSun);
+                assignedClustersFri = clusterDataOfDay(clustersBaseFri, 5);
+                assignedClustersSat = clusterDataOfDay(clustersBaseSat, 5);
+                assignedClustersSun = clusterDataOfDay(clustersBaseSun, 5);
                 console.log("Finished loading data");
-                //console.log("Starting transformation for clustering");
-                //var clusterBase = clusterDataOfDay(dataSun);
-                //console.log(clusterBase);
                 draw("friday", "all");
             }
 
             function draw(){
                 d3.selectAll("svg > *").remove();
                 var whichDay = document.querySelector('input[name="day"]:checked').value;
+                var whichClusterDay = document.querySelector('input[name="clusterFromDay"]:checked').value;
                 var whichID = document.getElementById('idOfPerson').value;
                 var whichAreas = getUncheckedBoxes("areas");
                 var whichCluster = document.getElementById('numCluster').value;
                 console.log("Showing info for cluster " + whichCluster);
+
                 if (whichCluster !== "all") {
+                    whichCluster = parseInt(whichCluster);
                     whichID = [];
-                    for (var i = 0; i < clustersFri.length; i++) {
-                        if (clustersFri[i].cluster === whichCluster) whichID.push(clustersFri[i].id);
+                    if (whichClusterDay  === "friday") {
+                        for (var i = 0; i < assignedClustersFri.length; i++) {
+                            if (assignedClustersFri[i].cluster === whichCluster) whichID.push(assignedClustersFri[i].id);
+                        }
+                    }
+                    else if (whichClusterDay === "saturday") {
+                        for (var i = 0; i < assignedClustersSat.length; i++) {
+                                if (assignedClustersSat[i].cluster === whichCluster) whichID.push(assignedClustersSat[i].id);
+                            }
+                    }
+                    else {
+                        for (var i = 0; i < assignedClustersSun.length; i++) {
+                                if (assignedClustersSun[i].cluster === whichCluster) whichID.push(assignedClustersSun[i].id);
+                            }
                     }
                 }
                 console.log("Showing graph for ID:s");
@@ -139,6 +177,34 @@
                     secondLinechart = createLinechart(dataFri, whichID, whichAreas, "secondaryLineChart");
                     thirdChart = createLinechart(dataSat, whichID, whichAreas, "thirdLineChart");
                 }
+            }
+            
+            function assignClusters() {
+                var whichDay = document.querySelector('input[name="clusterDay"]:checked').value;
+                var k = parseInt(document.getElementById('numClusters').value);
+
+                var transformedData;
+                if (whichDay === "friday") { 
+                    assignedClustersFri = clusterDataOfDay(clustersBaseFri, k);
+                }
+                else if (whichDay === "saturday") {
+                    assignedClustersSat = clusterDataOfDay(clustersBaseSat, k);
+                }
+                else {
+                    assignedClustersSun = clusterDataOfDay(clustersBaseSun, k);
+                }
+            }
+
+            function parseBehaviorDataIntoInt(data) {
+                data.forEach(function(d) {
+                    d.numSentMsg = +d.numSentMsg;
+                    d.numUniqueRec = +d.numUniqueRec;
+                    d.meanMinutesSinceLastMsg = +d.meanMinutesSinceLastMsg;
+                    d.numActiveInInterval = +d.numActiveInInterval;
+                    d.numVisitedLocations = +d.numVisitedLocations;
+                    d.numTraversedBetweenLocations = +d.numTraversedBetweenLocations;
+                });
+                return data;
             }
         </script>
     </body>    

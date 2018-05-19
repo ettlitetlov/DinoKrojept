@@ -6,6 +6,25 @@ Array.prototype.multisplice = function(args){
     }        
 }
 
+var binarySearch = function(array, value) {
+    //Source: https://gist.github.com/cbdavide/97100ac68e1f3699274b38a3d6bde7ba
+    var guess,
+        min = 0,
+        max = array.length - 1;	
+
+    while(min <= max){
+        guess = Math.floor((min + max) /2);
+	if(array[guess] === value)
+	    return guess;
+	else if(array[guess] < value)
+	    min = guess + 1;
+	else
+	    max = guess - 1;	
+     }
+	
+     return -1;
+}
+
 function createLinechart(inputData, whichID, whichAreas, whichSvg) {
     var data;
     if (whichID === "all" || whichID === "") {
@@ -13,6 +32,7 @@ function createLinechart(inputData, whichID, whichAreas, whichSvg) {
     }
     else {
         if (typeof whichID === 'string' || whichID instanceof String) whichID = [whichID];
+        else whichID.sort();
         data = extractDataForID(inputData, whichID);
     }
 
