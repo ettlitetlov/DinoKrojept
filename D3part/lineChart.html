@@ -41,8 +41,6 @@
             <script src="http://d3js.org/d3.v4.min.js"></script>
     </head>
     <body>
-        
-            
             <div id="main">
                 <div id ="chartHolder"><div id="mainLineChartDiv">
                         <p id="mainLineChartTitle"></p>
@@ -94,7 +92,17 @@
                                         <label for="coaster">Coaster Alley</label>
                                     </div>
                               </fieldset>
-
+                              <select name="filterOn" id="filterOn">
+                                <option value="none">none</option>
+                                <option value="numSentMsg">numSentMsg</option>
+                                <option value="numUniqueRec">numUniqueRec</option>
+                                <option value="meanMinutesSinceLastMsg">meanMinutesSinceLastMsg</option>
+                                <option value="numActiveInInterval">numActiveInInterval</option>
+                                <option value="numVisitedLocations">numVisitedLocations</option>
+                                <option value="numTraversedBetweenLocations">numTraversedBetweenLocations</option>
+                              </select> 
+                              filter by value less than: <input type="text" name="filterByLess" id="filterByLess" value="0"><br>
+                              filter by value more than: <input type="text" name="filterByMore" id="filterByMore" value="0"><br>
                         <input type="button" value="Show me the data" onclick="draw()">
                     </form>
 

@@ -36,7 +36,7 @@ function assignVariables(error, dFri, dSat, dSun, cFri, cSat, cSun) {
   assignedClustersSat = clusterDataOfDay(clustersBaseSat, 5);
   assignedClustersSun = clusterDataOfDay(clustersBaseSun, 5);
   console.log("Finished loading data");
-  draw("friday", "all");
+  draw();
 }
 
 function generateIDlistForCluster(whichCluster, whichClusterDay) {
@@ -60,6 +60,21 @@ function generateIDlistForCluster(whichCluster, whichClusterDay) {
   return whichID;
 }
 
+function filterByInstruction(filterOn) {
+    whichID = [];
+    var filterUpTo = document.getElementById('filterByLess').value;
+    filterUpTo = parseInt(filterUpTo);
+    var filterFrom = document.getElementById('filterByMore').value;
+    filterFrom = parseInt(filterFrom);
+    if (filterUpTo == 0) filterUpTo = infinity;
+    for (var i = 0; i < clustersBaseFri.length; i++) {
+        if (clustersBaseFri[i][filterOn] < filterUpTo && clustersBaseFri[i][filterOn] > filterFrom ) {
+          whichID.push(clustersBaseFri[i].id);
+        }
+    }
+    return whichID;
+}
+
 function draw(){
   d3.selectAll("svg > *").remove();
   var whichDay = document.querySelector('input[name="day"]:checked').value;
@@ -67,14 +82,19 @@ function draw(){
   var whichID = document.getElementById('idOfPerson').value;
   var whichAreas = getUncheckedBoxes("areas");
   var whichCluster = document.getElementById('numCluster').value;
+  var filterOn = document.getElementById('filterOn').value;
   console.log("Showing info for cluster " + whichCluster);
 
   if (whichCluster !== "all") {
       whichID = generateIDlistForCluster(whichCluster, whichClusterDay);
   }
+
+  if (filterOn != "none") {
+      whichID = filterByInstruction(filterOn);
+  }
+
   console.log("Showing graph for ID:s");
   console.log(whichID);
-  //filterdata(dataSun);
 
   if (whichDay === "friday") {
       linechart = createLinechart(dataFri, whichID, whichAreas, "mainLineChart");
