@@ -8,15 +8,69 @@ function filterdata(inData) {
     return data;
 }
 
-function clusterDataOfDay(data) {
-    data.splice(0, 1);
-    var kResult = kmeans(data, 10);
+function clusterDataOfDay(data, k) {
+    var dataForKMeans = generateKMeansData(data);
+    var kResult = kmeans(dataForKMeans, k);
     var idsAndClusters = [];
+    var clusterValues = generateClusterValuesBase(k);
     for (var i = 0; i < data.length; i++) {
-        idsAndClusters.push({id: data[i].id, cluster: kResult.assignments[i]});
+        var assignedCluster = kResult.assignments[i];
+        idsAndClusters.push({id: data[i].id, cluster: assignedCluster});
+        clusterValues[assignedCluster].meanNumSentMsg += data[i].numSentMsg;
+        clusterValues[assignedCluster].meanNumUniqueRec += data[i].numUniqueRec;
+        clusterValues[assignedCluster].meanMeanMinutesSinceLastMsg += data[i].meanMinutesSinceLastMsg;
+        clusterValues[assignedCluster].meanNumActiveInInterval += data[i].numActiveInInterval;
+        clusterValues[assignedCluster].meanNumVisitedLocations += data[i].numVisitedLocations;
+        clusterValues[assignedCluster].meanNumTraversedBetweenLocations += data[i].numTraversedBetweenLocations;
+        clusterValues[assignedCluster].clusterSize += 1;
     }
-    exportClusterData(idsAndClusters);
+    clusterValues = calculateMeansInClusterValues(clusterValues);
+    console.log("Clusters look like this:");
+    console.log(clusterValues);
+    return idsAndClusters;
+    //exportClusterData(idsAndClusters);
 } 
+
+function generateKMeansData(data) {
+    var result = [];
+    for (var i = 0; i < data.length; i++) {
+            var numSentMsg = data[i].numSentMsg;
+            var numUniqueRec = data[i].numUniqueRec;
+            var meanMinutesSinceLastMsg = data[i].meanMinutesSinceLastMsg;
+            var numActiveInInterval = data[i].numActiveInInterval;
+            var numVisitedLocations = data[i].numVisitedLocations;
+            var numTraversedBetweenLocations = data[i].numTraversedBetweenLocations;
+            result.push({numSentMsg, numUniqueRec, meanMinutesSinceLastMsg, numActiveInInterval, numVisitedLocations, numTraversedBetweenLocations});
+    }
+    return result;
+}
+
+function generateClusterValuesBase(k) {
+    var clusterValues = [];
+    for (var i = 0; i < k; i++) clusterValues.push(
+        {cluster: i,
+        meanNumSentMsg: 0,
+        meanNumUniqueRec: 0,
+        meanMeanMinutesSinceLastMsg: 0,
+        meanNumActiveInInterval: 0,
+        meanNumVisitedLocations: 0,
+        meanNumTraversedBetweenLocations: 0,
+        clusterSize: 0 });
+    return clusterValues;
+}
+
+function calculateMeansInClusterValues(clusterValues) {
+    var k = clusterValues.length;
+    for (var i = 0; i < k; i++) {
+        clusterValues[i].meanNumSentMsg /= clusterValues[i].clusterSize;
+        clusterValues[i].meanNumUniqueRec /= clusterValues[i].clusterSize;
+        clusterValues[i].meanMeanMinutesSinceLastMsg /= clusterValues[i].clusterSize;
+        clusterValues[i].meanNumActiveInInterval /= clusterValues[i].clusterSize;
+        clusterValues[i].meanNumVisitedLocations /= clusterValues[i].clusterSize;
+        clusterValues[i].meanNumTraversedBetweenLocations /= clusterValues[i].clusterSize;
+    }
+    return clusterValues;
+}
 
 function exportClusterData(data) {
     var lineArray = [];
