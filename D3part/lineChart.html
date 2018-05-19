@@ -12,6 +12,11 @@
                     vertical-align: top;
                     height: 100%;
                 }
+                #chartHolder {
+                    display: inline-block;
+                    width: 65%;
+                    height: 100%;
+                }
                 #userControls {
                     display: inline-block;
                     width: 20%;
@@ -39,10 +44,20 @@
         
             
             <div id="main">
-                <div id="mainLineChartDiv">
-                    <p id="mainLineChartTitle"></p>
-                    <svg id="mainLineChart" width="960" height="400"></svg>
+                <div id ="chartHolder"><div id="mainLineChartDiv">
+                        <p id="mainLineChartTitle"></p>
+                        <svg id="mainLineChart" width="960" height="400"></svg>
+                    </div>
+                    <div id="secondaryLineChartDiv">
+                        <p id="secondaryLineChartTitle"></p>
+                        <svg id="secondaryLineChart" width="450" height="300"></svg>
+                    </div>
+                    <div id="thirdLineChartDiv">
+                        <p id="thirdLineChartTitle"></p>
+                        <svg id="thirdLineChart" width="450" height="300"></svg>
+                    </div>
                 </div>
+
                 <div id="userControls">
                         <p>Please refrain from trying to display any data until you've seen the first graph! :) </p>
                     <form action="">
@@ -98,14 +113,7 @@
                         Saturday: <span id="numClustersSat">5</span> <br>
                         Sunday: <span id="numClustersSun">5</span></p>
                 </div>
-                <div id="secondaryLineChartDiv">
-                    <p id="secondaryLineChartTitle"></p>
-                    <svg id="secondaryLineChart" width="500" height="300"></svg>
-                </div>
-                <div id="thirdLineChartDiv">
-                    <p id="thirdLineChartTitle"></p>
-                    <svg id="thirdLineChart" width="500" height="300"></svg>
-                </div>
+                
             </div>
         <script src='./static/js/k-means.js' type='text/javascript'></script>
         <script src='./static/js/filterdata.js' type='text/javascript'></script>
