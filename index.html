@@ -28,11 +28,11 @@ div {
 
 
 </style>
-<svg width="960" height="600"></svg>
+<svg width="100%" height="800"></svg>
 <div>
   <input type="range" min="0" max="200" value="1" id="slider" onmouseup="newForceGraph()">
   <output id="output"></output>
-  
+  <input type="button" id="filter" value="Filter with selected ids" onclick="filterData()">
 </div>
 <div id="dataRange"></div>
 <script src="https://d3js.org/d3.v4.min.js"></script>
@@ -100,6 +100,10 @@ function onSlide() {
 function newForceGraph(){
   onSlide();
   fg.updateForceGraph();
+}
+
+function filterData(){
+  fg.filterForceData();
 }
 
 
