@@ -119,6 +119,8 @@ function draw(){
   console.log("Showing graph for ID:s");
   console.log(whichID);
 
+  exportIDs(whichID);
+
   if (whichDay === "friday") {
       linechart = createLinechart(dataFri, whichID, whichAreas, "mainLineChart");
       secondLinechart = createLinechart(dataSat, whichID, whichAreas, "secondaryLineChart");
@@ -187,4 +189,25 @@ function parseBehaviorDataIntoInt(data) {
       d.numVisitedDays = +d.numVisitedDays;
   });
   return data;
+}
+
+function exportIDs(whichIDs) {
+    var lineArray = [];
+    for (var index = 0; index < whichIDs.length; index++) {
+        var line = whichIDs[index];
+        lineArray.push(index == 0 ? "data:text/csv;charset=utf-8," + line : line);
+    }
+    var csvContent = lineArray.join("\n");
+    makeDownloadLink(csvContent);
+}
+
+function makeDownloadLink(csvContent, whichDay) {
+    var encodedUri = encodeURI(csvContent);
+    var link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "filteredIDs.csv");
+    link.innerHTML= "Click here to download current ID list";
+    document.getElementById("downloadLinkDiv").innerHTML = "";
+    document.getElementById("downloadLinkDiv").appendChild(link); 
+    //link.click();
 }
