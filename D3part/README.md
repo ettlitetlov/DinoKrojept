@@ -1,4 +1,2 @@
-# SwedishElectionVis
+# Vast Challenge 2015
 Tiny Uni project from a course about information visualisation.
-
-A link to the visualisation: [Try it out](https://ettlitetlov.github.io/SwedishElectionVis/)
