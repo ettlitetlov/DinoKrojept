@@ -7,6 +7,29 @@
             <link rel="stylesheet" href="./static/lib/css//bootstrap.min.css">
             <link rel="stylesheet" href="./static/lib/css/keen-dashboards.css">
             <style>
+                body {
+                    background-color: #f1f1f2;
+                    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+                    font-size: 11pt;
+                }
+                a {
+                    color: #434378;
+                }
+                a:hover {
+                    color: #434378;
+                    text-decoration: none;
+                }
+                input {
+                    background-color: #e4e4e7;
+                    border: none;
+                }
+                input[type = button] {
+                    font-weight: bold;
+                    padding: 3 px;
+                }
+                label {
+                    font-weight: normal;
+                }
                 #main {
                     margin: 20px;
                     vertical-align: top;
@@ -30,6 +53,7 @@
                 #mainLineChartDiv {
                     display: inline-block;
                     vertical-align: top;
+                    font-size: 8pt;
                 }
                 #secondaryLineChartDiv {
                     display: inline-block;
@@ -37,14 +61,34 @@
                 #thirdLineChartDiv {
                     display: inline-block;
                 }
+                #mainLineChartTitle {
+                    font-size: 14pt;
+                    font-weight: bold;
+                }
+                #secondaryLineChartTitle {
+                    font-size: 14pt;
+                    font-weight: bold;
+                }
+                #thirdLineChartTitle {
+                    font-size: 14pt;
+                    font-weight: bold;
+                }
+                h1 {
+                    font-size: 14pt;
+                    font-weight: bold;
+                }
+                svg {
+                    background-color: #ffffff;
+                }
             </style>
             <script src="http://d3js.org/d3.v4.min.js"></script>
     </head>
     <body>
             <div id="main">
-                <div id ="chartHolder"><div id="mainLineChartDiv">
+                <div id ="chartHolder">
+                    <div id="mainLineChartDiv">
                         <p id="mainLineChartTitle"></p>
-                        <svg id="mainLineChart" width="960" height="400"></svg>
+                        <svg id="mainLineChart" width="900" height="400"></svg>
                     </div>
                     <div id="secondaryLineChartDiv">
                         <p id="secondaryLineChartTitle"></p>
@@ -57,7 +101,7 @@
                 </div>
 
                 <div id="userControls">
-                        <p>Please refrain from trying to display any data until you've seen the first graph! :) </p>
+                    <h1>Choose which data to view</h1> 
                     <form action="">
                         <input type="radio" id="dayOfData" name="day" value="friday" checked="checked"> Friday<br>
                         <input type="radio" id="dayOfData" name="day" value="saturday"> Saturday<br>
@@ -70,7 +114,7 @@
                         <input type="radio" id="clusterFromDay" name="clusterFromDay" value="saturday"> Saturday<br>
                         <input type="radio" id="clusterFromDay" name="clusterFromDay" value="sunday"> Sunday<br>
                         <fieldset>
-                                Areas<br>
+                                <b>Areas:</b><br>
                                 <div>
                                   <input type="checkbox" id="kiddie" name="areas" value="0" checked>
                                   <label for="kiddie">Kiddie Land</label>
@@ -92,6 +136,7 @@
                                         <label for="coaster">Coaster Alley</label>
                                     </div>
                               </fieldset>
+                              <b>Filter by:</b><br>
                               <select name="filterOn" id="filterOn">
                                 <option value="none">none</option>
                                 <option value="numSentMsg">numSentMsg</option>
@@ -101,7 +146,7 @@
                                 <option value="numVisitedLocations">numVisitedLocations</option>
                                 <option value="numTraversedBetweenLocations">numTraversedBetweenLocations</option>
                                 <option value="numVisitedDays">numVisitedDays</option>
-                              </select> 
+                              </select> <br>
                               filter by value less than: <input type="text" name="filterByLess" id="filterByLess" value="0"><br>
                               filter by value more than: <input type="text" name="filterByMore" id="filterByMore" value="0"><br>
                                 <input type="radio" id="filterFromDay" name="filterFromDay" value="all" checked="checked"> All Days<br>
@@ -111,6 +156,8 @@
 
                 </div>
                 <div id="clusterControls">
+                    <h1>Recalculate clusters</h1> 
+
                     <form>
                         Number of clusters: <input type="text" name="numClusters" id="numClusters" value="5"><br>
                         <b>Day for clustering:</b><br>
@@ -123,7 +170,10 @@
                         Friday: <span id="numClustersFri">5</span> <br>
                         Saturday: <span id="numClustersSat">5</span> <br>
                         Sunday: <span id="numClustersSun">5</span></p>
-                        <div id="downloadLinkDiv">Link is going here...</div>
+                    
+                    <h1>Download list of currently displayed IDs</h1> 
+                    <p id="downloadLinkHolder">Link is going here...</p>
+                    <p id="numIDsInfoHolder">Number of ID:s is going here...</p>
                 </div>
                 
             </div>

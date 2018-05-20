@@ -121,6 +121,15 @@ function draw(){
 
   exportIDs(whichID);
 
+  var numIDs;
+  if (typeof whichID === 'string' || whichID instanceof String) {
+      if (whichID === "all") numIDs = "all";
+      else numIDs = 1;
+  }
+  else numIDs = whichID.length;
+
+  document.getElementById("numIDsInfoHolder").innerHTML = "Currently displaying " + numIDs + " IDs."; 
+
   if (whichDay === "friday") {
       linechart = createLinechart(dataFri, whichID, whichAreas, "mainLineChart");
       secondLinechart = createLinechart(dataSat, whichID, whichAreas, "secondaryLineChart");
@@ -207,7 +216,7 @@ function makeDownloadLink(csvContent, whichDay) {
     link.setAttribute("href", encodedUri);
     link.setAttribute("download", "filteredIDs.csv");
     link.innerHTML= "Click here to download current ID list";
-    document.getElementById("downloadLinkDiv").innerHTML = "";
-    document.getElementById("downloadLinkDiv").appendChild(link); 
+    document.getElementById("downloadLinkHolder").innerHTML = "";
+    document.getElementById("downloadLinkHolder").appendChild(link); 
     //link.click();
 }

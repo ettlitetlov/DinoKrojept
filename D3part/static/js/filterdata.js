@@ -18,6 +18,7 @@ function filterdata(inDataFri, inDataSat, inDataSun) {
     return data;
 }
 
+//**Clustering functions */
 function clusterDataOfDay(data, k) {
     var dataForKMeans = generateKMeansData(data);
     var kResult = kmeans(dataForKMeans, k);
@@ -32,6 +33,7 @@ function clusterDataOfDay(data, k) {
         clusterValues[assignedCluster].meanNumActiveInInterval += data[i].numActiveInInterval;
         clusterValues[assignedCluster].meanNumVisitedLocations += data[i].numVisitedLocations;
         clusterValues[assignedCluster].meanNumTraversedBetweenLocations += data[i].numTraversedBetweenLocations;
+        clusterValues[assignedCluster].meanNumVisitedDays += data[i].numVisitedDays;
         clusterValues[assignedCluster].clusterSize += 1;
     }
     clusterValues = calculateMeansInClusterValues(clusterValues);
@@ -50,7 +52,9 @@ function generateKMeansData(data) {
             var numActiveInInterval = data[i].numActiveInInterval;
             var numVisitedLocations = data[i].numVisitedLocations;
             var numTraversedBetweenLocations = data[i].numTraversedBetweenLocations;
-            result.push({numSentMsg, numUniqueRec, meanMinutesSinceLastMsg, numActiveInInterval, numVisitedLocations, numTraversedBetweenLocations});
+            var numVisitedDays = data[i].numVisitedDays;
+            result.push({numSentMsg, numUniqueRec, meanMinutesSinceLastMsg, numActiveInInterval,
+                 numVisitedLocations, numTraversedBetweenLocations, numVisitedDays});
     }
     return result;
 }
@@ -65,6 +69,7 @@ function generateClusterValuesBase(k) {
         meanNumActiveInInterval: 0,
         meanNumVisitedLocations: 0,
         meanNumTraversedBetweenLocations: 0,
+        meanNumVisitedDays: 0,
         clusterSize: 0 });
     return clusterValues;
 }
@@ -78,6 +83,8 @@ function calculateMeansInClusterValues(clusterValues) {
         clusterValues[i].meanNumActiveInInterval /= clusterValues[i].clusterSize;
         clusterValues[i].meanNumVisitedLocations /= clusterValues[i].clusterSize;
         clusterValues[i].meanNumTraversedBetweenLocations /= clusterValues[i].clusterSize;
+        clusterValues[i].meanNumVisitedDays /= clusterValues[i].clusterSize;
+
     }
     return clusterValues;
 }
@@ -101,6 +108,7 @@ function transformDataOfDayForCluster(data) {
     return idBehaviors;
 }
 
+//** Other */
 function generateTransformedDataBase() {
     var transformedData = [];
     for (var timeSinceStart = 0; timeSinceStart < 940; timeSinceStart += 5) {
