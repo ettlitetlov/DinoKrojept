@@ -2,9 +2,14 @@ d3.queue()
 .defer(d3.csv, './static/data/comm-data-Fri.csv')
 .defer(d3.csv, './static/data/comm-data-Sat.csv')
 .defer(d3.csv, './static/data/comm-data-Sun.csv')
+.defer(d3.csv, './static/data/idBehaviorDataFriWithNumDays.csv')
+.defer(d3.csv, './static/data/idBehaviorDataSatWithNumDays.csv')
+.defer(d3.csv, './static/data/idBehaviorDataSunWithNumDays.csv')
+/*
 .defer(d3.csv, './static/data/idBehaviorDataFri.csv')
 .defer(d3.csv, './static/data/idBehaviorDataSat.csv')
 .defer(d3.csv, './static/data/idBehaviorDataSun.csv')
+*/
 .await(assignVariables);
 
 
@@ -60,16 +65,34 @@ function generateIDlistForCluster(whichCluster, whichClusterDay) {
   return whichID;
 }
 
-function filterByInstruction(filterOn) {
+function filterByInstruction(filterOn, whichDay) {
     whichID = [];
     var filterUpTo = document.getElementById('filterByLess').value;
     filterUpTo = parseInt(filterUpTo);
     var filterFrom = document.getElementById('filterByMore').value;
     filterFrom = parseInt(filterFrom);
-    if (filterUpTo == 0) filterUpTo = infinity;
-    for (var i = 0; i < clustersBaseFri.length; i++) {
-        if (clustersBaseFri[i][filterOn] < filterUpTo && clustersBaseFri[i][filterOn] > filterFrom ) {
-          whichID.push(clustersBaseFri[i].id);
+
+    var filterFromDay = document.querySelector('input[name="filterFromDay"]:checked').value;
+    var clusterBaseForDay;
+    if (filterFromDay === "all") {
+        //Will result in IDs being in list up to 3 times (O(3n)), fix?
+        whichID = fillIDListByInstruction(filterOn, clustersBaseFri, filterFrom, filterUpTo);
+        whichID = whichID.concat(fillIDListByInstruction(filterOn, clustersBaseSat, filterFrom, filterUpTo));
+        whichID = whichID.concat(fillIDListByInstruction(filterOn, clustersBaseSun, filterFrom, filterUpTo));
+    }
+    else {
+        if (whichDay === "friday") whichID = fillIDListByInstruction(filterOn, clustersBaseFri, filterFrom, filterUpTo);
+        else if (whichDay === "saturday") whichID = fillIDListByInstruction(filterOn, clustersBaseSat, filterFrom, filterUpTo);
+        else whichID = fillIDListByInstruction(filterOn, clustersBaseSun, filterFrom, filterUpTo);
+    }
+    return whichID;
+}
+
+function fillIDListByInstruction(filterOn, clusterBaseForDay, filterFrom, filterUpTo) {
+    if (filterUpTo == 0) filterUpTo = Math.pow(10, 1000);
+    for (var i = 0; i < clusterBaseForDay.length; i++) {
+        if (clusterBaseForDay[i][filterOn] < filterUpTo && clusterBaseForDay[i][filterOn] > filterFrom ) {
+          whichID.push(clusterBaseForDay[i].id);
         }
     }
     return whichID;
@@ -83,14 +106,14 @@ function draw(){
   var whichAreas = getUncheckedBoxes("areas");
   var whichCluster = document.getElementById('numCluster').value;
   var filterOn = document.getElementById('filterOn').value;
-  console.log("Showing info for cluster " + whichCluster);
 
   if (whichCluster !== "all") {
       whichID = generateIDlistForCluster(whichCluster, whichClusterDay);
+      console.log("Showing info for cluster " + whichCluster);
   }
 
   if (filterOn != "none") {
-      whichID = filterByInstruction(filterOn);
+      whichID = filterByInstruction(filterOn, whichDay);
   }
 
   console.log("Showing graph for ID:s");
@@ -161,6 +184,7 @@ function parseBehaviorDataIntoInt(data) {
       d.numActiveInInterval = +d.numActiveInInterval;
       d.numVisitedLocations = +d.numVisitedLocations;
       d.numTraversedBetweenLocations = +d.numTraversedBetweenLocations;
+      d.numVisitedDays = +d.numVisitedDays;
   });
   return data;
 }

@@ -100,9 +100,12 @@
                                 <option value="numActiveInInterval">numActiveInInterval</option>
                                 <option value="numVisitedLocations">numVisitedLocations</option>
                                 <option value="numTraversedBetweenLocations">numTraversedBetweenLocations</option>
+                                <option value="numVisitedDays">numVisitedDays</option>
                               </select> 
                               filter by value less than: <input type="text" name="filterByLess" id="filterByLess" value="0"><br>
                               filter by value more than: <input type="text" name="filterByMore" id="filterByMore" value="0"><br>
+                                <input type="radio" id="filterFromDay" name="filterFromDay" value="all" checked="checked"> All Days<br>
+                                <input type="radio" id="filterFromDay" name="filterFromDay" value="onlySelected"> Only selected day<br>
                         <input type="button" value="Show me the data" onclick="draw()">
                     </form>
 

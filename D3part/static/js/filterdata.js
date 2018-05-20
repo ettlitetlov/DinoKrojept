@@ -1,9 +1,19 @@
-function filterdata(inData) {
+function filterdata(inDataFri, inDataSat, inDataSun) {
     //var data = transformDataForStackedAreaChart(inData);
     //var data2 = extractInterestingData(inData);
-    var data2 = extractEventData(inData);
-    exportInterestingData(data2);
+    //var data2 = extractEventData(inData);
+    //exportInterestingData(data2);
     //var data = extractDataForID(inData, "839736");
+    var behaviorDataFri = extractIDBehavior(inDataFri);
+    console.log("done with basic behavior for fri");
+
+    var behaviorDataSat = extractIDBehavior(inDataSat);
+    console.log("done with basic behavior for sat");
+
+    var behaviorDataSun = extractIDBehavior(inDataSun);
+    console.log("done with basic behavior for all days");
+
+    addNumDaysVisitedToBehaviorDataAndExport(behaviorDataFri, behaviorDataSat, behaviorDataSun);
     //exportStackedAreaData(data);
     return data;
 }
@@ -209,7 +219,8 @@ function getIDBehaviorBaseObject(inputObject, thisTime) {
         meanMinutesSinceLstMsg: 0,
         numActiveInInterval: 1,
         numVisitedLocations: 1,
-        numTraversedBetweenLocations: 0
+        numTraversedBetweenLocations: 0,
+        numVisitedDays: 1
     };
 }
 
@@ -248,7 +259,50 @@ function extractIDBehavior(data) {
         return transformedData;
 }
 
-function exportIDBehaviorData(data) {
+function addNumDaysVisitedToBehaviorDataAndExport(dataFri, dataSat, dataSun) {
+    dataFri.forEach(function(d) {d.numVisitedDays = 1;});
+    dataSat.forEach(function(d) {d.numVisitedDays = 1;});
+    dataSun.forEach(function(d) {d.numVisitedDays = 1;});
+
+    for (var i = 0; i < dataFri.length; i++) {
+        var d = dataFri[i];
+        if (dataSat.some(function(k) {return k.id === d.id})) d.numVisitedDays += 1;
+        if (dataSun.some(function(k) {return k.id === d.id})) d.numVisitedDays += 1;
+    }
+    dataSat.forEach(function (d) {
+        if (dataFri.some(function(k) {return k.id === d.id})) d.numVisitedDays += 1;
+        if (dataSun.some(function(k) {return k.id === d.id})) d.numVisitedDays += 1;
+    }) ;
+    dataSun.forEach(function (d) {
+        if (dataSat.some(function(k) {return k.id === d.id})) d.numVisitedDays += 1;
+        if (dataFri.some(function(k) {return k.id === d.id})) d.numVisitedDays += 1;
+    });
+    exportIDBehaviorDataWithVisitedDays(dataFri, "friday");
+    exportIDBehaviorDataWithVisitedDays(dataSat, "saturday");
+    exportIDBehaviorDataWithVisitedDays(dataSun, "sunday");
+}
+
+function exportIDBehaviorDataWithVisitedDays(data, whichDay) {
+    console.log("input received for " + whichDay);
+    console.log(data);
+    var lineArray = [];
+    data.forEach(function (data, index) {
+        var line = 
+            data.id + "," + 
+            data.numSentMsg + "," + 
+            data.numUniqueRec + "," + 
+            data.meanMinutesSinceLastMsg + "," + 
+            data.numActiveInInterval + "," + 
+            data.numVisitedLocations + "," + 
+            data.numTraversedBetweenLocations + "," + 
+            data.numVisitedDays;
+        lineArray.push(index == 0 ? "data:text/csv;charset=utf-8," + line : line);
+    });
+    var csvContent = lineArray.join("\n");
+    makeDownloadLink(csvContent, whichDay);
+}
+
+function exportIDBehaviorData(data, whichDay) {
     var lineArray = [];
     data.forEach(function (data, index) {
         var line = 
@@ -262,14 +316,14 @@ function exportIDBehaviorData(data) {
         lineArray.push(index == 0 ? "data:text/csv;charset=utf-8," + line : line);
     });
     var csvContent = lineArray.join("\n");
-    makeDownloadLink(csvContent);
+    makeDownloadLink(csvContent, whichDay);
 }
 
-function makeDownloadLink(csvContent) {
+function makeDownloadLink(csvContent, whichDay) {
     var encodedUri = encodeURI(csvContent);
     var link = document.createElement("a");
     link.setAttribute("href", encodedUri);
-    link.setAttribute("download", "my_data.csv");
+    link.setAttribute("download", whichDay + ".csv");
     link.innerHTML= "Click Here to download";
     document.body.appendChild(link); // Required for FF
 
