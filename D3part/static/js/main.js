@@ -66,7 +66,7 @@ function generateIDlistForCluster(whichCluster, whichClusterDay) {
 }
 
 function filterByInstruction(filterOn, whichDay) {
-    whichID = [];
+    var whichID = [];
     var filterUpTo = document.getElementById('filterByLess').value;
     filterUpTo = parseInt(filterUpTo);
     var filterFrom = document.getElementById('filterByMore').value;
@@ -77,8 +77,8 @@ function filterByInstruction(filterOn, whichDay) {
     if (filterFromDay === "all") {
         //Will result in IDs being in list up to 3 times (O(3n)), fix?
         whichID = fillIDListByInstruction(filterOn, clustersBaseFri, filterFrom, filterUpTo);
-        whichID = whichID.concat(fillIDListByInstruction(filterOn, clustersBaseSat, filterFrom, filterUpTo));
-        whichID = whichID.concat(fillIDListByInstruction(filterOn, clustersBaseSun, filterFrom, filterUpTo));
+        whichID = concatUnique(whichID, fillIDListByInstruction(filterOn, clustersBaseSat, filterFrom, filterUpTo));
+        whichID = concatUnique(whichID, fillIDListByInstruction(filterOn, clustersBaseSun, filterFrom, filterUpTo));
     }
     else {
         if (whichDay === "friday") whichID = fillIDListByInstruction(filterOn, clustersBaseFri, filterFrom, filterUpTo);
@@ -89,6 +89,7 @@ function filterByInstruction(filterOn, whichDay) {
 }
 
 function fillIDListByInstruction(filterOn, clusterBaseForDay, filterFrom, filterUpTo) {
+    var whichID = [];
     if (filterUpTo == 0) filterUpTo = Math.pow(10, 1000);
     for (var i = 0; i < clusterBaseForDay.length; i++) {
         if (clusterBaseForDay[i][filterOn] < filterUpTo && clusterBaseForDay[i][filterOn] > filterFrom ) {
@@ -96,6 +97,13 @@ function fillIDListByInstruction(filterOn, clusterBaseForDay, filterFrom, filter
         }
     }
     return whichID;
+}
+
+function concatUnique(list1, list2) {
+    for (var i = 0; i < list2.length; i++) {
+        if (! list1.includes(list2[i])) list1.push(list2[i]);
+    }
+    return list1;
 }
 
 function draw(){
