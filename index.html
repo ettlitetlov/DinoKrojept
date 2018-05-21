@@ -32,7 +32,9 @@ div {
 <div>
   <input type="range" min="0" max="200" value="1" id="slider" onmouseup="newForceGraph()">
   <output id="output"></output>
+  <input type="text" id="typeValue" placeholder="Enter ID you want to find">
   <input type="button" id="filter" value="Filter with selected ids" onclick="filterData()">
+
 </div>
 <div id="dataRange"></div>
 <script src="https://d3js.org/d3.v4.min.js"></script>
@@ -46,7 +48,7 @@ function draw(data){
 }
 
 d3.queue()
-   .defer(d3.csv, 'comm-data-Sun.csv')
+   .defer(d3.csv, 'comm-data-Fri.csv')
    .await(function(error, data) {
       if(error) throw error;  
       draw(data);
@@ -103,7 +105,7 @@ function newForceGraph(){
 }
 
 function filterData(){
-  fg.filterForceData();
+    fg.filterForceData();
 }
 
 

@@ -187,6 +187,9 @@ function forceGraph(data) {
     }
     this.filterForceData = function() {
         console.log("Starting filtering.")
+        console.log(parseInt(document.getElementById("typeValue").value));
+        if(document.getElementById("typeValue").value)
+            listToSend.push(parseInt(document.getElementById("typeValue").value));
         update(0, listToSend);
         document.getElementById("output").value = "Displaying commdata from: " + listToSend;
     }
