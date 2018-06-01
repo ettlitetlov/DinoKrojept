@@ -6,7 +6,7 @@ Array.prototype.multisplice = function(args){
     }        
 }
 
-function createLinechart(inputData, whichID, whichAreas, whichSvg) {
+function createLinechart(inputData, whichID, whichAreas, whichSvg, yScaling) {
     var data;
     if (whichID === "all" || whichID === "") {
         data = transformDataForStackedAreaChart(inputData);
@@ -52,7 +52,7 @@ function createLinechart(inputData, whichID, whichAreas, whichSvg) {
 
     y.domain([
         d3.min(areas, function(c) { return d3.min(c.values, function(d) { return d.numMessages; }); }),
-        d3.max(areas, function(c) { return d3.max(c.values, function(d) { return d.numMessages; }); })
+        d3.max(areas, function(c) { return Math.max(yScaling, d3.max(c.values, function(d) { return d.numMessages; })); })
     ]);
 
     z.domain(areas.map(function(c) { return c.id; }));

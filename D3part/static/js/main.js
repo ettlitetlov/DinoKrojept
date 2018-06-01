@@ -114,6 +114,13 @@ function draw(){
   var whichAreas = getUncheckedBoxes("areas");
   var whichCluster = document.getElementById('numCluster').value;
   var filterOn = document.getElementById('filterOn').value;
+  var yScale = document.querySelector('input[name="yScaling"]:checked').value;
+  if (yScale === "uniform") {
+    yScale = 12000;
+  }
+  else {
+    yScale = 0;
+  }
 
   if (whichCluster !== "all") {
       whichID = generateIDlistForCluster(whichCluster, whichClusterDay);
@@ -139,19 +146,19 @@ function draw(){
   document.getElementById("numIDsInfoHolder").innerHTML = "Currently displaying " + numIDs + " IDs."; 
 
   if (whichDay === "friday") {
-      linechart = createLinechart(dataFri, whichID, whichAreas, "mainLineChart");
-      secondLinechart = createLinechart(dataSat, whichID, whichAreas, "secondaryLineChart");
-      thirdChart = createLinechart(dataSun, whichID, whichAreas, "thirdLineChart");
+      linechart = createLinechart(dataFri, whichID, whichAreas, "mainLineChart", yScale);
+      secondLinechart = createLinechart(dataSat, whichID, whichAreas, "secondaryLineChart", yScale);
+      thirdChart = createLinechart(dataSun, whichID, whichAreas, "thirdLineChart", yScale);
   }
   else if (whichDay === "saturday") {
-      linechart = createLinechart(dataSat, whichID, whichAreas, "mainLineChart");
-      secondLinechart = createLinechart(dataFri, whichID, whichAreas, "secondaryLineChart");
-      thirdChart = createLinechart(dataSun, whichID, whichAreas, "thirdLineChart");
+      linechart = createLinechart(dataSat, whichID, whichAreas, "mainLineChart", yScale);
+      secondLinechart = createLinechart(dataFri, whichID, whichAreas, "secondaryLineChart", yScale);
+      thirdChart = createLinechart(dataSun, whichID, whichAreas, "thirdLineChart", yScale);
   }
   else {
-      linechart = createLinechart(dataSun, whichID, whichAreas, "mainLineChart");
-      secondLinechart = createLinechart(dataFri, whichID, whichAreas, "secondaryLineChart");
-      thirdChart = createLinechart(dataSat, whichID, whichAreas, "thirdLineChart");
+      linechart = createLinechart(dataSun, whichID, whichAreas, "mainLineChart", yScale);
+      secondLinechart = createLinechart(dataFri, whichID, whichAreas, "secondaryLineChart", yScale);
+      thirdChart = createLinechart(dataSat, whichID, whichAreas, "thirdLineChart", yScale);
   }
   setCorrectHeaders(whichDay);
 }

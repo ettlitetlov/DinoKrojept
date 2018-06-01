@@ -1,0 +1,78 @@
+    <!DOCTYPE html>
+<html>
+    <title>DinoKrojept Manipulate data</title>
+    <head>
+            <meta charset="utf-8" /> 
+            <title>Dino park visualization</title>
+            <link rel="stylesheet" href="./static/lib/css//bootstrap.min.css">
+            <link rel="stylesheet" href="./static/lib/css/keen-dashboards.css">
+            <script src="http://d3js.org/d3.v4.min.js"></script>
+    </head>
+    <body>
+        <script src='./static/js/k-means.js' type='text/javascript'></script>
+        <script src='./static/js/filterdata.js' type='text/javascript'></script>
+
+        <script>
+                d3.queue()
+                .defer(d3.csv, './static/data/idBehaviorDataFri.csv')
+                .defer(d3.csv, './static/data/idBehaviorDataSat.csv')
+                .defer(d3.csv, './static/data/idBehaviorDataSun.csv')
+                .await(assignVariables);
+
+
+            var linechart, secondLinechart, thirdChart, filteredData;
+            var dataFri, dataSat, dataSun;
+
+            function assignVariables(error, dFri, dSat, dSun) {
+                //Loading original data
+                if (error) throw error;
+                console.log("Started filtering");
+                addNumDaysVisitedToBehaviorDataAndExport(dFri, dSat, dSun);
+                //dataSat = parseBehaviorDataIntoInt(dSat);
+                //dataSun = parseBehaviorDataIntoInt(dSun);
+                console.log("Finished loading data");
+                //console.log("Starting transformation for clustering");
+                //var clusterBase = clusterDataOfDay(dataSun);
+                //console.log(clusterBase);
+                //clusterDataOfDay(dataFri, 5);
+            }
+
+            function parseBehaviorDataIntoInt(data) {
+                data.forEach(function(d) {
+                    d.numSentMsg = +d.numSentMsg;
+                    d.numUniqueRec = +d.numUniqueRec;
+                    d.meanMinutesSinceLastMsg = +d.meanMinutesSinceLastMsg;
+                    d.numActiveInInterval = +d.numActiveInInterval;
+                    d.numVisitedLocations = +d.numVisitedLocations;
+                    d.numTraversedBetweenLocations = +d.numTraversedBetweenLocations;
+                });
+                return data;
+            }
+
+          /*  function draw(){
+                d3.selectAll("svg > *").remove();
+                var whichDay = document.querySelector('input[name="day"]:checked').value;
+                var whichID = document.getElementById('idOfPerson').value;
+                var whichAreas = getUncheckedBoxes("areas");
+
+                //filterdata(dataSun);
+
+                if (whichDay === "friday") {
+                    linechart = createLinechart(dataFri, whichID, whichAreas, "mainLineChart");
+                    secondLinechart = createLinechart(dataSat, whichID, whichAreas, "secondaryLineChart");
+                    thirdChart = createLinechart(dataSun, whichID, whichAreas, "thirdLineChart");
+                }
+                else if (whichDay === "saturday") {
+                    linechart = createLinechart(dataSat, whichID, whichAreas, "mainLineChart");
+                    secondLinechart = createLinechart(dataFri, whichID, whichAreas, "secondaryLineChart");
+                    thirdChart = createLinechart(dataSun, whichID, whichAreas, "thirdLineChart");
+                }
+                else {
+                    linechart = createLinechart(dataSun, whichID, whichAreas, "mainLineChart");
+                    secondLinechart = createLinechart(dataFri, whichID, whichAreas, "secondaryLineChart");
+                    thirdChart = createLinechart(dataSat, whichID, whichAreas, "thirdLineChart");
+                }
+            }*/
+        </script>
+    </body>    
+</html>
